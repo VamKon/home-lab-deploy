@@ -1,0 +1,5 @@
+name: kube-prometheus-stack
+namespace: monitoring
+chartRepoURL: https://prometheus-community.github.io/helm-charts
+chart: kube-prometheus-stack
+chartVersion: "58.4.0"

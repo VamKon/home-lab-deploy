@@ -1,0 +1,4 @@
+name: cert-manager-issuers
+namespace: cert-manager
+path: addons/cert-manager-issuers
+syncWave: "1"

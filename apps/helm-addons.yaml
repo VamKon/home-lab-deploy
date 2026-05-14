@@ -1,0 +1,41 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: helm-addons
+  namespace: argocd
+spec:
+  generators:
+    - git:
+        repoURL: https://github.com/VamKon/home-lab-deploy.git
+        revision: HEAD
+        files:
+          - path: "addons/*/helm.yaml"
+  template:
+    metadata:
+      name: "{{name}}"
+      namespace: argocd
+      finalizers:
+        - resources-finalizer.argocd.argoproj.io
+    spec:
+      project: default
+      sources:
+        - repoURL: "{{chartRepoURL}}"
+          chart: "{{chart}}"
+          targetRevision: "{{chartVersion}}"
+          helm:
+            releaseName: "{{name}}"
+            valueFiles:
+              - $values/addons/{{name}}/values.yaml
+        - repoURL: https://github.com/VamKon/home-lab-deploy.git
+          targetRevision: HEAD
+          ref: values
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: "{{namespace}}"
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=true
+          - ServerSideApply=true
