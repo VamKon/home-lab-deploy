@@ -1,0 +1,4 @@
+name: kafka
+namespace: kafka
+path: addons/kafka
+syncWave: "1"

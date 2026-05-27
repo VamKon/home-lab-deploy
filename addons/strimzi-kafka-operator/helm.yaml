@@ -1,0 +1,5 @@
+name: strimzi-kafka-operator
+namespace: strimzi-kafka-operator
+chartRepoURL: https://strimzi.io/charts/
+chart: strimzi-kafka-operator
+chartVersion: "0.44.0"
