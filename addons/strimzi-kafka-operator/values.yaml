@@ -1,5 +1,4 @@
-watchNamespaces:
-  - kafka
+watchAnyNamespace: true
 
 resources:
   requests:
