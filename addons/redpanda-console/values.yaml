@@ -3,3 +3,12 @@ console:
     kafka:
       brokers:
         - kafka-kafka-bootstrap.kafka.svc.cluster.local:9092
+
+ingress:
+  enabled: true
+  ingressClassName: traefik
+  hosts:
+    - host: redpanda.vamseekonda.com
+      paths:
+        - path: /
+          pathType: Prefix
