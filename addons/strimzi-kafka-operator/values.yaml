@@ -1,7 +1,7 @@
 # Move extraEnvs to the root level when watchAnyNamespace is true
 extraEnvs:
   - name: STRIMZI_KUBERNETES_VERSION
-    value: "1.33"
+    value: "major=1,minor=33"
 
 watchAnyNamespace: true
 
