@@ -1,0 +1,5 @@
+name: redpanda-console
+namespace: kafka
+chartRepoURL: https://charts.redpanda.com
+chart: console
+chartVersion: "0.7.26"

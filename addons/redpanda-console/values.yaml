@@ -1,0 +1,5 @@
+console:
+  config:
+    kafka:
+      brokers:
+        - kafka-kafka-bootstrap.kafka.svc.cluster.local:9092
