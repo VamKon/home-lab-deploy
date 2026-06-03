@@ -1,10 +1,13 @@
-clusterOperator:
-  # Extra environment variables to be added to the Cluster Operator container
-  extraEnvs:
-    - name: STRIMZI_KUBERNETES_VERSION
-      value: "1.33" # Adjust this to match your k3s cluster's minor version baseline (e.g., 1.29, 1.30, 1.31)
+# Move extraEnvs to the root level when watchAnyNamespace is true
+extraEnvs:
+  - name: STRIMZI_KUBERNETES_VERSION
+    value: "1.33"
 
 watchAnyNamespace: true
+
+clusterOperator:
+  # Leave this empty or use it for other operator-specific settings if needed
+  # but keep extraEnvs at the root level
 
 resources:
   requests:
