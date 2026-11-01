@@ -15,6 +15,9 @@ imagePullSecrets:           # private ghcr.io package — secret created by Terr
 
 host: knab.kondas.org
 
+# true → 0 pods, for copying a DB into the PVC with a helper pod. Set back to false after.
+paused: true
+
 env:
   TZ: America/Chicago       # month boundaries (budget, forecast) use local time
   KNAB_AUTH: required

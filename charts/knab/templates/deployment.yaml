@@ -6,7 +6,8 @@ metadata:
     {{- include "knab.labels" . | nindent 4 }}
 spec:
   # SQLite + the in-process sync/backup scheduler assume exactly one process.
-  replicas: 1
+  # `paused: true` scales to 0 (via git, so Argo self-heal doesn't undo it) for DB copies/restores.
+  replicas: {{ if .Values.paused }}0{{ else }}1{{ end }}
   strategy:
     type: Recreate
   selector:
