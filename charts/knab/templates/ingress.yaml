@@ -1,0 +1,27 @@
+# TLS ends here (Traefik); the pod speaks plain http. The certificate comes from
+# the private homelab CA (addons/cert-manager-issuers), trusted on your devices.
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: knab
+  labels:
+    {{- include "knab.labels" . | nindent 4 }}
+  annotations:
+    cert-manager.io/cluster-issuer: {{ .Values.ingress.clusterIssuer }}
+    traefik.ingress.kubernetes.io/router.entrypoints: websecure
+spec:
+  ingressClassName: {{ .Values.ingress.className }}
+  tls:
+    - hosts: [{{ .Values.host | quote }}]
+      secretName: knab-tls
+  rules:
+    - host: {{ .Values.host | quote }}
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: knab
+                port:
+                  name: http

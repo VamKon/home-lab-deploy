@@ -1,0 +1,38 @@
+# ── knab — Helm values ─────────────────────────────────────────────────────
+# Namespace + Secrets come from Terraform (home-lab-infrastructure/modules/knab):
+#   knab-secrets  KNAB_MASTER_KEY (encrypted secret store; Plaid/Anthropic keys
+#                 live encrypted in the DB, entered via Settings)
+#   ghcr          image pull secret for the private ghcr.io package
+
+image:
+  repository: ghcr.io/vamkon/knab
+  # Pin to the tag you pushed — Argo only rolls the pod when this changes.
+  tag: "2026-10-31.1"
+  pullPolicy: IfNotPresent
+
+imagePullSecrets:           # private ghcr.io package — secret created by Terraform (ghcr_token)
+  - name: ghcr
+
+host: knab.kondas.org
+
+env:
+  TZ: America/Chicago       # month boundaries (budget, forecast) use local time
+  KNAB_AUTH: required
+  KNAB_SYNC_INTERVAL_HOURS: "4"
+  KNAB_BACKUP_KEEP: "14"
+
+secretName: knab-secrets
+
+# SQLite DB + daily backups. local-path deletes the data with the PVC, so the
+# PVC is marked keep/no-prune and survives an Argo prune or chart removal.
+storage:
+  size: 5Gi
+  storageClass: ""          # blank → cluster default (local-path)
+
+resources:
+  requests: { cpu: "100m", memory: "256Mi" }
+  limits:   { cpu: "1000m", memory: "1Gi" }
+
+ingress:
+  className: traefik
+  clusterIssuer: homelab-ca

@@ -1,0 +1,4 @@
+name: knab
+namespace: knab
+path: charts/knab
+syncWave: "4"

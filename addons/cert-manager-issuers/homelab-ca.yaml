@@ -1,0 +1,29 @@
+# Private CA for internal hostnames (reached over LAN / Twingate, never public).
+# The `selfsigned` issuer mints the root once; `homelab-ca` signs app certs with it.
+# Trust it on each device by installing the root:
+#   kubectl -n cert-manager get secret homelab-ca-root -o jsonpath='{.data.ca\.crt}' | base64 -d > homelab-ca.crt
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: homelab-ca-root
+  namespace: cert-manager
+spec:
+  isCA: true
+  commonName: Homelab CA
+  secretName: homelab-ca-root
+  duration: 87600h      # 10 years — reinstalling the root on devices is the painful part
+  privateKey:
+    algorithm: ECDSA
+    size: 256
+  issuerRef:
+    name: selfsigned
+    kind: ClusterIssuer
+    group: cert-manager.io
+---
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: homelab-ca
+spec:
+  ca:
+    secretName: homelab-ca-root

@@ -1,0 +1,40 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: local-charts
+  namespace: argo-cd
+spec:
+  # Helm charts that live in THIS repo, as opposed to `helm-addons` which pulls
+  # published charts from an upstream registry. Discovery file is
+  # charts/<name>/app.yaml.
+  generators:
+    - git:
+        repoURL: https://github.com/VamKon/home-lab-deploy.git
+        revision: HEAD
+        files:
+          - path: "charts/*/app.yaml"
+  template:
+    metadata:
+      name: "{{name}}"
+      namespace: argo-cd
+      finalizers:
+        - resources-finalizer.argocd.argoproj.io
+      annotations:
+        argocd.argoproj.io/sync-wave: "{{syncWave}}"
+    spec:
+      project: default
+      source:
+        repoURL: https://github.com/VamKon/home-lab-deploy.git
+        targetRevision: HEAD
+        path: "{{path}}"
+        helm:
+          releaseName: "{{name}}"
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: "{{namespace}}"
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=true
