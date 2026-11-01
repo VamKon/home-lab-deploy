@@ -1,0 +1,39 @@
+# Publicly trusted certs for internal-only hostnames (LAN / Twingate): DNS-01
+# via Cloudflare, so nothing has to be reachable from the internet. The token
+# Secret `cloudflare-api-token` (key api-token, Zone:DNS:Edit on kondas.org)
+# is created by Terraform (home-lab-infrastructure/modules/cert-manager-cloudflare).
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-staging
+spec:
+  acme:
+    server: https://acme-staging-v02.api.letsencrypt.org/directory
+    privateKeySecretRef:
+      name: letsencrypt-staging-account
+    solvers:
+      - selector:
+          dnsZones: [kondas.org]
+        dns01:
+          cloudflare:
+            apiTokenSecretRef:
+              name: cloudflare-api-token
+              key: api-token
+---
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-prod
+spec:
+  acme:
+    server: https://acme-v02.api.letsencrypt.org/directory
+    privateKeySecretRef:
+      name: letsencrypt-prod-account
+    solvers:
+      - selector:
+          dnsZones: [kondas.org]
+        dns01:
+          cloudflare:
+            apiTokenSecretRef:
+              name: cloudflare-api-token
+              key: api-token

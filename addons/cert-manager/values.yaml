@@ -23,3 +23,10 @@ cainjector:
       memory: 64Mi
     limits:
       memory: 128Mi
+
+# DNS-01 self-checks go straight to public resolvers: NextDNS rewrites (e.g.
+# knab.kondas.org → LAN IP) also cover subdomains, which would hide the
+# _acme-challenge TXT records from cert-manager.
+extraArgs:
+  - --dns01-recursive-nameservers-only
+  - --dns01-recursive-nameservers=1.1.1.1:53,8.8.8.8:53
