@@ -1,0 +1,8 @@
+apiVersion: v2
+name: mahi
+description: Admissions coach (grades, GPA/rank, activities, roadmap) — single pod, SQLite on a PVC
+type: application
+version: 0.1.0
+appVersion: "0.1.0"
+maintainers:
+  - name: Vamsee

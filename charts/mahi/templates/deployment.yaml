@@ -1,0 +1,77 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mahi
+  labels:
+    {{- include "mahi.labels" . | nindent 4 }}
+spec:
+  # SQLite + the in-process backup/job scheduler assume exactly one process.
+  # `paused: true` scales to 0 (via git, so Argo self-heal doesn't undo it) for DB copies/restores.
+  replicas: {{ if .Values.paused }}0{{ else }}1{{ end }}
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      {{- include "mahi.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "mahi.selectorLabels" . | nindent 8 }}
+    spec:
+      # A Service named "mahi" would otherwise inject MAHI_PORT=tcp://… and
+      # clobber the app's own MAHI_PORT setting.
+      enableServiceLinks: false
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000     # `mahi` user in the image
+        runAsGroup: 1000
+        fsGroup: 1000
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: mahi
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 8000
+          env:
+            - name: MAHI_BASE_URL
+              value: "https://{{ .Values.host }}"
+            {{- range $k, $v := .Values.env }}
+            - name: {{ $k }}
+              value: {{ $v | quote }}
+            {{- end }}
+          envFrom:
+            - secretRef:
+                name: {{ .Values.secretName }}
+          volumeMounts:
+            - name: data
+              mountPath: /data
+            - name: tmp
+              mountPath: /tmp
+          readinessProbe:
+            httpGet: { path: /healthz, port: http }
+            periodSeconds: 10
+          livenessProbe:
+            httpGet: { path: /healthz, port: http }
+            initialDelaySeconds: 20
+            periodSeconds: 30
+            failureThreshold: 4
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: [ALL]
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: mahi-data
+        - name: tmp
+          emptyDir: {}

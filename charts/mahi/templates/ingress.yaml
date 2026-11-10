@@ -1,0 +1,27 @@
+# TLS ends here (Traefik); the pod speaks plain http. Publicly trusted cert from
+# Let's Encrypt via DNS-01 (addons/cert-manager-issuers/letsencrypt.yaml).
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: mahi
+  labels:
+    {{- include "mahi.labels" . | nindent 4 }}
+  annotations:
+    cert-manager.io/cluster-issuer: {{ .Values.ingress.clusterIssuer }}
+    traefik.ingress.kubernetes.io/router.entrypoints: websecure
+spec:
+  ingressClassName: {{ .Values.ingress.className }}
+  tls:
+    - hosts: [{{ .Values.host | quote }}]
+      secretName: mahi-tls
+  rules:
+    - host: {{ .Values.host | quote }}
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: mahi
+                port:
+                  name: http

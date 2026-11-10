@@ -1,0 +1,40 @@
+# ── mahi — Helm values ─────────────────────────────────────────────────────
+# Namespace + Secrets come from Terraform (home-lab-infrastructure/modules/mahi):
+#   mahi-secrets  MAHI_MASTER_KEY (encrypted secret store; the Anthropic key lives
+#                 encrypted in the DB, entered via Settings)
+#   ghcr          image pull secret for the private ghcr.io package
+
+image:
+  repository: ghcr.io/vamkon/mahi
+  # Pin to the tag you pushed — Argo only rolls the pod when this changes.
+  tag: "2026-11-10.1"
+  pullPolicy: IfNotPresent
+
+imagePullSecrets:           # private ghcr.io package — secret created by Terraform (ghcr_token)
+  - name: ghcr
+
+host: mahi.kondas.org
+
+# true → 0 pods, for copying a DB into the PVC with a helper pod. Set back to false after.
+paused: false
+
+env:
+  TZ: America/Chicago       # school-year and grading-period dates use local time
+  MAHI_BACKUP_KEEP: "14"
+
+secretName: mahi-secrets
+
+# SQLite DB, uploaded screenshots and daily backups. local-path deletes the data
+# with the PVC, so the PVC is marked keep/no-prune and survives an Argo prune or
+# chart removal.
+storage:
+  size: 5Gi
+  storageClass: ""          # blank → cluster default (local-path)
+
+resources:
+  requests: { cpu: "100m", memory: "256Mi" }
+  limits:   { cpu: "1000m", memory: "1Gi" }
+
+ingress:
+  className: traefik
+  clusterIssuer: letsencrypt-prod

@@ -1,0 +1,4 @@
+name: mahi
+namespace: mahi
+path: charts/mahi
+syncWave: "4"
