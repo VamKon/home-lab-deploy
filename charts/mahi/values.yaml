@@ -7,7 +7,7 @@
 image:
   repository: ghcr.io/vamkon/mahi
   # Pin to the tag you pushed — Argo only rolls the pod when this changes.
-  tag: "2026-11-10.4"
+  tag: "2026-11-10.5"
   pullPolicy: IfNotPresent
 
 imagePullSecrets:           # private ghcr.io package — secret created by Terraform (ghcr_token)
