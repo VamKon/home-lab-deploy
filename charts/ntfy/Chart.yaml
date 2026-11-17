@@ -1,0 +1,8 @@
+apiVersion: v2
+name: ntfy
+description: Self-hosted ntfy push server (mahi's notifications) — single pod, SQLite on a PVC
+type: application
+version: 0.1.0
+appVersion: "2.37.2"
+maintainers:
+  - name: Vamsee

@@ -1,0 +1,36 @@
+# ── ntfy — Helm values ─────────────────────────────────────────────────────
+# Push notifications for mahi (charts/mahi). Private instance: auth on, deny-all by default.
+# No Kubernetes Secrets: users, ACLs and tokens live in ntfy's auth DB on the PVC and are
+# created once with `ntfy user|access|token` via kubectl exec (see mahi's CLAUDE.md, "ntfy").
+#
+# iOS: Apple only allows push through a central server, so `upstreamBaseUrl` forwards a poll
+# request to ntfy.sh for each message. It carries only the message ID and the SHA-256 of the
+# topic URL, never the text; the phone then fetches the message from this server (over the
+# home network or Twingate) and shows "New message" if it can't reach it.
+
+image:
+  repository: binwiederhier/ntfy
+  # Pin to an exact release; bump deliberately (https://docs.ntfy.sh/releases/).
+  tag: "v2.37.2"
+  pullPolicy: IfNotPresent
+
+host: ntfy.kondas.org
+
+upstreamBaseUrl: https://ntfy.sh   # "" to turn off iOS instant delivery (Android/web unaffected)
+cacheDuration: 24h                 # how long messages are kept for phones that were offline
+
+env:
+  TZ: America/Chicago
+
+# Auth DB + message cache. Kept on prune, like mahi-data: losing it drops the users and tokens.
+storage:
+  size: 1Gi
+  storageClass: ""          # blank → cluster default (local-path)
+
+resources:
+  requests: { cpu: "20m", memory: "32Mi" }
+  limits:   { cpu: "500m", memory: "256Mi" }
+
+ingress:
+  className: traefik
+  clusterIssuer: letsencrypt-prod

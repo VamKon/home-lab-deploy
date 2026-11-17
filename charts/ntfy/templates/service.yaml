@@ -1,0 +1,14 @@
+# mahi publishes in-cluster to http://ntfy.ntfy.svc.cluster.local (MAHI_NTFY_URL).
+apiVersion: v1
+kind: Service
+metadata:
+  name: ntfy
+  labels:
+    {{- include "ntfy.labels" . | nindent 4 }}
+spec:
+  selector:
+    {{- include "ntfy.selectorLabels" . | nindent 4 }}
+  ports:
+    - name: http
+      port: 80
+      targetPort: http

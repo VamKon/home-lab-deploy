@@ -1,0 +1,4 @@
+name: ntfy
+namespace: ntfy
+path: charts/ntfy
+syncWave: "4"

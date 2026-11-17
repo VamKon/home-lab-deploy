@@ -1,0 +1,21 @@
+# ntfy server config (https://docs.ntfy.sh/config/). Nothing secret here.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ntfy-config
+  labels:
+    {{- include "ntfy.labels" . | nindent 4 }}
+data:
+  server.yml: |
+    base-url: "https://{{ .Values.host }}"
+    listen-http: ":8080"
+    behind-proxy: true
+    cache-file: "/var/lib/ntfy/cache.db"
+    cache-duration: {{ .Values.cacheDuration | quote }}
+    auth-file: "/var/lib/ntfy/user.db"
+    auth-default-access: "deny-all"
+    enable-signup: false
+    enable-login: true
+    {{- with .Values.upstreamBaseUrl }}
+    upstream-base-url: {{ . | quote }}
+    {{- end }}

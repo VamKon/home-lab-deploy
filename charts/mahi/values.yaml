@@ -7,7 +7,7 @@
 image:
   repository: ghcr.io/vamkon/mahi
   # Pin to the tag you pushed — Argo only rolls the pod when this changes.
-  tag: "2026-11-12.1"
+  tag: "2026-11-16.1"
   pullPolicy: IfNotPresent
 
 imagePullSecrets:           # private ghcr.io package — secret created by Terraform (ghcr_token)
@@ -21,6 +21,10 @@ paused: false
 env:
   TZ: America/Chicago       # school-year and grading-period dates use local time
   MAHI_BACKUP_KEEP: "14"
+  # Push notifications (charts/ntfy). mahi publishes in-cluster; phones subscribe to the public
+  # host. The ntfy access token is entered in Settings (encrypted in the DB), not here.
+  MAHI_NTFY_URL: http://ntfy.ntfy.svc.cluster.local
+  MAHI_NTFY_PUBLIC_URL: https://ntfy.kondas.org
 
 secretName: mahi-secrets
 

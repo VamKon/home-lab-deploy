@@ -1,0 +1,27 @@
+# Phones subscribe here (LAN via the NextDNS rewrite, away from home via Twingate). TLS ends at
+# Traefik with a Let's Encrypt DNS-01 cert; ntfy runs with behind-proxy: true.
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ntfy
+  labels:
+    {{- include "ntfy.labels" . | nindent 4 }}
+  annotations:
+    cert-manager.io/cluster-issuer: {{ .Values.ingress.clusterIssuer }}
+    traefik.ingress.kubernetes.io/router.entrypoints: websecure
+spec:
+  ingressClassName: {{ .Values.ingress.className }}
+  tls:
+    - hosts: [{{ .Values.host | quote }}]
+      secretName: ntfy-tls
+  rules:
+    - host: {{ .Values.host | quote }}
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: ntfy
+                port:
+                  name: http
